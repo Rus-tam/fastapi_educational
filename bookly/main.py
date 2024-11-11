@@ -4,30 +4,61 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-@app.get('/')
-async def read_root() -> dict:
-    return {"message": "Hello world"}
+books = [
+    {
+        "id": 1,
+        "title": "Book 1",
+        "author": "Author 1",
+        "publisher": "Publisher 1",
+        "published_data": "Published data 1",
+        "page_count": 1234,
+        "language": "English"
+    },
+    {
+        "id": 2,
+        "title": "Book 2",
+        "author": "Author 2",
+        "publisher": "Publisher 2",
+        "published_data": "Published data 2",
+        "page_count": 4321,
+        "language": "English"
+    },
+        {
+        "id": 3,
+        "title": "Book 3",
+        "author": "Author 3",
+        "publisher": "Publisher 3",
+        "published_data": "Published data 3",
+        "page_count": 5678,
+        "language": "English"
+    },
+        {
+        "id": 4,
+        "title": "Book 4",
+        "author": "Author 4",
+        "publisher": "Publisher 4",
+        "published_data": "Published data 4",
+        "page_count": 9432,
+        "language": "English"
+    },
+]
 
-@app.get('/greet/{name}/{age}')
-async def greet_name(name: str, age: int) -> dict:
-    return {"message": f"Hello, {name}. Age {age}"}
+@app.get("/books")
+async def get_all_books():
+    return books
 
+@app.post("/books")
+async def create_a_book() -> dict:
+    pass
 
-class BookCreateModel(BaseModel):
-    title: str
-    author: str
+@app.get("/book/{book_id}")
+async def get_book(book_id: int) -> dict:
+    pass
 
-@app.post('/create_book')
-async def create_book(book_data: BookCreateModel):
-    return {
-        "title": book_data.title,
-        "author": book_data.author
-    }
+@app.put("/book/{book_id}")
+async def update_book(book_id: int) -> dict:
+    pass
 
-@app.get('/get_headers')
-async def get_headers(accept: str = Header(None)):
-    request_headers = {}
-
-    request_headers["Accept"] = accept
-
-    return request_headers
+@app.delete("/book/{book_id}")
+async def delete_book(book_id: int) -> dict:
+    pass
