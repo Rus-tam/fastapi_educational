@@ -1,12 +1,15 @@
 from fastapi import FastAPI, status
 from pydantic import BaseModel
 from typing import Optional, List
+from fastapi.exceptions import HTTPException
 from random import randrange
+
 
 app = FastAPI()
 
 
 class Post(BaseModel):
+    id: int
     title: str
     content: str
     published: bool = True
@@ -21,22 +24,31 @@ my_posts: List[Post] = [
 
 @app.get("/", status_code=status.HTTP_200_OK, response_model=List[Post])
 async def root():
-    return {"data": my_posts}
+    return my_posts
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=Post)
-async def creat_posts(post: Post):
+async def create_posts(post: Post):
     post_dict = post.dict()
     post_dict["id"] = randrange(0, 100000000)
     my_posts.append(post_dict)
-    return {"data": post_dict}
+    return post_dict
 
 
 @app.get("/posts/{id}", status_code=status.HTTP_200_OK, response_model=Post)
 def get_post(id: int):
-    res_post: Post = {}
     for post in my_posts:
         if post["id"] == id:
-            res_post = post
+            return post
 
-    return res_post
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+
+
+@app.delete("/posts/{id}", status_code=status.HTTP_200_OK)
+def delete_post(id: int):
+    for post in my_posts:
+        if post["id"] == id:
+            my_posts.remove(post)
+            return {"message": "Post successefully delated"}
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
