@@ -23,3 +23,10 @@ async def create_contact(
 @app.get("/api/contacts/", response_model=List[_schemas.Contact])
 async def get_contacts(db: "Session" = _fastapi.Depends(_services.get_db)):
     return await _services.get_all_contacts(db=db)
+
+
+@app.get("/api/contacts/{contact_id}", response_model=_schemas.Contact)
+async def get_contact(
+    contact_id: int, db: "Session" = _fastapi.Depends(_services.get_db)
+):
+    return await _services.get_contact(contact_id=contact_id, db=db)
