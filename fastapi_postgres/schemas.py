@@ -13,6 +13,9 @@ class Contact(_BaseContact):
     id: int
     date_created: _dt.datetime
 
+    class Config:
+        from_attributes = True
+
 
 class CreateContact(_BaseContact):
     pass

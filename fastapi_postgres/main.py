@@ -17,4 +17,4 @@ async def create_contact(
     contact: _schemas.CreateContact,
     db: _orm.Session = _fastapi.Depends(_services.get_db),
 ):
-    pass
+    return await _services.create_contact(contact=contact, db=db)
