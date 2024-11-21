@@ -44,11 +44,26 @@ def get_post(id: int):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
 
 
-@app.delete("/posts/{id}", status_code=status.HTTP_200_OK)
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
     for post in my_posts:
         if post["id"] == id:
             my_posts.remove(post)
             return {"message": "Post successefully delated"}
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+
+
+@app.put("/posts/{id}", status_code=status.HTTP_200_OK)
+def update_post(id: int, update_post: Post):
+    post_dict = update_post.dict()
+    post_dict["id"] = id
+
+    index = 0
+    for post in my_posts:
+        if post["id"] == id:
+            index = my_posts.index(post)
+            my_posts[index] = post_dict
+            return post_dict
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
