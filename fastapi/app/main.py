@@ -12,6 +12,7 @@ app = FastAPI()
 
 
 class Post(BaseModel):
+    id: int
     title: str
     content: str
     published: bool = True
@@ -49,10 +50,10 @@ async def get_posts():
     return posts
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=Post)
 async def create_posts(post: Post):
     cursor.execute(
-        """INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
+        """INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *;""",
         (post.title, post.content, post.published),
     )
     new_post = cursor.fetchone()
@@ -64,11 +65,9 @@ async def create_posts(post: Post):
 
 @app.get("/posts/{id}", status_code=status.HTTP_200_OK, response_model=Post)
 def get_post(id: int):
-    for post in my_posts:
-        if post["id"] == id:
-            return post
-
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    cursor.execute("""SELECT * FROM posts WHERE id = %s;""", (str(id)))
+    post = cursor.fetchone()
+    return post
 
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
