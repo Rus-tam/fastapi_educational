@@ -90,15 +90,18 @@ def delete_post(id: int):
 
 
 @app.put("/posts/{id}", status_code=status.HTTP_200_OK)
-def update_post(id: int, update_post: Post):
-    post_dict = update_post.dict()
-    post_dict["id"] = id
+def update_post(id: int, updates: Post):
+    cursor.execute(
+        """UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *;""",
+        (updates.title, updates.content, updates.published, str(id)),
+    )
+    updated_post = cursor.fetchone()
+    conn.commit()
 
-    index = 0
-    for post in my_posts:
-        if post["id"] == id:
-            index = my_posts.index(post)
-            my_posts[index] = post_dict
-            return post_dict
+    if not updated_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post with id: {id} does not exist",
+        )
 
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    return updated_post
