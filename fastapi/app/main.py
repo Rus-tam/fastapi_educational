@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Response
 from pydantic import BaseModel
 from typing import List
 from fastapi.exceptions import HTTPException
@@ -67,17 +67,26 @@ async def create_posts(post: Post):
 def get_post(id: int):
     cursor.execute("""SELECT * FROM posts WHERE id = %s;""", (str(id)))
     post = cursor.fetchone()
+
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+        )
     return post
 
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    for post in my_posts:
-        if post["id"] == id:
-            my_posts.remove(post)
-            return {"message": "Post successefully delated"}
+    cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *;""", (str(id),))
+    deleted_post = cursor.fetchone()
+    conn.commit()
 
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    if not deleted_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+        )
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @app.put("/posts/{id}", status_code=status.HTTP_200_OK)
