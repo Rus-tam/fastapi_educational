@@ -23,3 +23,13 @@ def get_postst(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
 
     return posts
+
+
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=Post)
+def create_post(post: Post, db: Session = Depends(get_db)):
+    new_post = models.Post(**post.dict())
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+
+    return new_post
