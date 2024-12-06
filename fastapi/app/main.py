@@ -6,7 +6,7 @@ from .routers import post, user, auth
 models.Base.metadata.create_all(bind=engine)
 
 
-app = FastAPI()
+app = FastAPI(swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"})
 
 
 app.include_router(post.router)

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from pydantic import EmailStr
+from pydantic import EmailStr, validator
 from typing import Optional
 
 
@@ -48,3 +48,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+    @validator("id", pre=True)
+    def convert_id(cls, value):
+        return str(value)
