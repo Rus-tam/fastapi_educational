@@ -27,6 +27,7 @@ def create_post(
 ):
 
     new_post = models.Post(**post.dict())
+    new_post.owner_id = current_user.id
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
