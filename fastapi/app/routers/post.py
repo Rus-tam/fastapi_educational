@@ -26,8 +26,7 @@ def create_post(
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
 
-    new_post = models.Post(**post.dict())
-    new_post.owner_id = current_user.id
+    new_post = models.Post(owner_id=current_user.id, **post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -65,6 +64,12 @@ def delete_post(
             detail=f"post with id: {id} does not exist",
         )
 
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to perform requested action",
+        )
+
     post.delete(synchronize_session=False)
     db.commit()
 
@@ -85,6 +90,12 @@ def update_post(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with id: {id} does not exist",
+        )
+
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to perform requested action",
         )
 
     post_query.update(updated_post.dict(), synchronize_session=False)
