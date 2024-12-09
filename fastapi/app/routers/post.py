@@ -13,8 +13,9 @@ router = APIRouter(prefix="/api/v1/posts", tags=["Posts"])
 def get_postst(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
+    limit: int = 10,
 ):
-    posts = db.query(models.Post).all()
+    posts = db.query(models.Post).limit(limit).all()
 
     return posts
 
