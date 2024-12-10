@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from pydantic import EmailStr, validator
+from pydantic import EmailStr, validator, conint
 from typing import Optional
 
 
@@ -54,3 +54,8 @@ class TokenData(BaseModel):
     @validator("id", pre=True)
     def convert_id(cls, value):
         return str(value)
+
+
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(le=1)
