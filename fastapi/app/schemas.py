@@ -48,7 +48,7 @@ class PostOut(BaseModel):
     votes: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Token(BaseModel):

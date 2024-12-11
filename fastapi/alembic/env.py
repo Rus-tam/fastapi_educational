@@ -5,9 +5,26 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from app.models import Base
+from app.models import *
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+config.set_main_option(
+    "sqlalchemy.url",
+    f"postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -18,8 +35,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from app.database import Base
-from app.models import *
+
 
 target_metadata = Base.metadata
 
